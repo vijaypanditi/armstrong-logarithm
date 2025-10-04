@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Web Calculator</title>
+    
+    <style>
+        /* --- 2. CSS for Styling --- */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .calculator {
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-color: #585757;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            width: 300px; /* Fixed width for better layout control */
+        }
+
+        .display {
+            background-color: #222;
+            color: #fff;
+            font-size: 2.5em;
+            text-align: right;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden; /* Prevent overflow of large numbers */
+            height: 50px;
+            line-height: 50px;
+        }
+
+        .buttons {
+            display: grid;
+            /* 4 columns: three for numbers/ops, one for equals/clear */
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #ccc;
+            transition: background-color 0.1s;
+        }
+
+        button:hover {
+            background-color: #a0a0a0;
+        }
+
+        /* Styling for specific buttons */
+        .operator {
+            background-color: #ff9500;
+            color: white;
+        }
+        .operator:hover {
+            background-color: #e08b00;
+        }
+
+        .clear, .equals {
+            background-color: #d8d8d8;
+        }
+
+        .clear {
+            background-color: #ff3b30;
+            color: white;
+        }
+        .clear:hover {
+             background-color: #e03028;
+        }
+        
+        /* Make the equals button span two columns */
+        .equals {
+            grid-column: span 2;
+            background-color: #4cd964;
+            color: white;
+        }
+        .equals:hover {
+            background-color: #40c055;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">AC</button>
+            <button class="operator" onclick="appendInput('(')">(</button>
+            <button class="operator" onclick="appendInput(')')">)</button>
+            <button class="operator" onclick="appendInput('/')">/</button>
+
+            <button onclick="appendInput('7')">7</button>
+            <button onclick="appendInput('8')">8</button>
+            <button onclick="appendInput('9')">9</button>
+            <button class="operator" onclick="appendInput('')"></button>
+
+            <button onclick="appendInput('4')">4</button>
+            <button onclick="appendInput('5')">5</button>
+            <button onclick="appendInput('6')">6</button>
+            <button class="operator" onclick="appendInput('-')">-</button>
+
+            <button onclick="appendInput('1')">1</button>
+            <button onclick="appendInput('2')">2</button>
+            <button onclick="appendInput('3')">3</button>
+            <button class="operator" onclick="appendInput('+')">+</button>
+
+            <button onclick="appendInput('0')">0</button>
+            <button onclick="appendInput('.')">.</button>
+            <button class="equals" onclick="calculateResult()">=</button>
+        </div>
+    </div>
+
+    <script>
+        // Get the display element
+        const display = document.getElementById('display');
+        let currentInput = '';
+        let resultCalculated = false;
+
+        // Function to handle number/operator button clicks
+        function appendInput(value) {
+            // If a result was just calculated, clear the display before starting a new calculation
+            if (resultCalculated) {
+                clearDisplay();
+                resultCalculated = false;
+            }
+            
+            // Prevent leading zeros if the input is empty (unless it's '0.')
+            if (currentInput === '0' && value !== '.') {
+                currentInput = value;
+            } else {
+                currentInput += value;
+            }
+            
+            display.innerText = currentInput;
+        }
+
+        // Function to clear the display (AC button)
+        function clearDisplay() {
+            currentInput = '';
+            display.innerText = '0';
+            resultCalculated = false;
+        }
+
+        // Function to calculate the final result (= button)
+        function calculateResult() {
+            if (currentInput === '') {
+                display.innerText = '0';
+                return;
+            }
+            
+            try {
+                // The 'eval()' function is used to securely evaluate the math expression string.
+                // It is generally avoided in professional code for security, but is simplest for a basic calculator.
+                let result = eval(currentInput); 
+                
+                // Fix for floating point precision issues (e.g., 0.1 + 0.2)
+                if (result.toString().includes('.') && result.toString().split('.')[1].length > 10) {
+                     result = result.toFixed(10);
+                }
+
+                display.innerText = result;
+                currentInput = String(result);
+                resultCalculated = true;
+
+            } catch (e) {
+                // Handle invalid expressions (like '5++')
+                display.innerText = 'Error';
+                currentInput = '';
+            }
+        }
+    </script>
+</body>
+</html>
